@@ -53,7 +53,7 @@ const predictMatchup = async (team1, team2) => {
   const fixedTeam2 = normalizeTeamName(team2);
 
   try {
-    const res = await fetch("h${process.env.REACT_APP_API_URL}/predict", {
+    const res = await fetch(`${process.env.REACT_APP_API_URL}/predict`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ team1: fixedTeam1, team2: fixedTeam2 }),
