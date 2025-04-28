@@ -52,7 +52,9 @@ pip install fastapi uvicorn pandas xgboost scikit-learn
 #Run the API
 cd python-backend
 uvicorn main:app --reload
+ngrok http 8000
 ```
+Make sure you copy the ngrok URL to the global variable set up for it in Vercel
 
 This will run on http://127.0.01:8000
 
