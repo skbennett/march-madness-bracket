@@ -55,8 +55,7 @@ uvicorn main:app --reload
 ngrok http 8000
 ```
 Make sure you copy the ngrok URL to the global variable set up for it in Vercel
-
-This will run on http://127.0.01:8000
+Reload Vercel
 
 Be sure to start the backend and then start the frontend with
 ```bash
