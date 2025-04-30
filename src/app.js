@@ -28,7 +28,7 @@ const regions = [
   { name: "West",   teams: [
       "Florida","Norfolk State","UConn","Oklahoma",
       "Memphis","Colorado St.","Maryland","Grand Canyon",
-      "Missouri","Drake","Texas Tech","UNC Wilmington",
+      "Missouri","Drake","Texas Tech","UNC W",
       "Kansas","Arkansas","St. John's","Omaha"
   ]}
 ];
@@ -53,7 +53,7 @@ const predictMatchup = async (team1, team2) => {
   const fixedTeam2 = normalizeTeamName(team2);
 
   try {
-    const res = await fetch(`${process.env.REACT_APP_API_URL}/predict`, {
+    const res = await fetch(`http://127.0.0.1/predict`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ team1: fixedTeam1, team2: fixedTeam2 }),
@@ -104,75 +104,52 @@ const getFinalFourTeams = (idx) => {
   };
 
     return (
-    <div className="min-h-screen bg-gray-50 p-8 overflow-auto">
-      <h1 className="text-4xl font-bold text-center mb-12">2025 March Madness Bracket</h1>
+  <div className="min-h-screen bg-gray-50 p-4 overflow-auto text-sm">
+    <h1 className="text-3xl font-bold text-center mb-8">2025 March Madness Bracket</h1>
 
-      {/* Top Half */}
-      <div className="flex justify-center items-start space-x-32">
-        <RegionSection title="South" regionIdx={2} generateRounds={generateRounds} selections={selections} onSelect={handleSelect} />
-        <RegionSection title="East" regionIdx={0} generateRounds={generateRounds} selections={selections} onSelect={handleSelect} flip />
-      </div>
+    {/* Top Half */}
+    <div className="flex justify-center items-start space-x-16">
+      <RegionSection
+        title="South"
+        regionIdx={2}
+        generateRounds={generateRounds}
+        selections={selections}
+        onSelect={handleSelect}
+      />
+      <RegionSection
+        title="East"
+        regionIdx={0}
+        generateRounds={generateRounds}
+        selections={selections}
+        onSelect={handleSelect}
+        flip
+      />
+    </div>
 
-      {/* Final Four */}
-       
-      <div className="flex justify-center items-center space-x-16"> 
-        {["South/East Winner", "West/Midwest Winner"].map((matchId, idx) => (
-          <div key={matchId} className="flex flex-col items-center">
-            <h2 className="font-semibold mb-2">FINAL FOUR</h2>
-            <select
-              className="w-48 h-12 border rounded shadow flex items-center"
-              value={selections[`finalfour-${idx}`] || ''}
-              onChange={(e) => handleSelect(`finalfour-${idx}`, e.target.value)}
-            >
-              <option disabled value="">Select Winner</option>
-              {getFinalFourTeams(idx).map(team => (
-                <option key={team}>{team}</option>
-              ))}
-            </select>
-            <button
-              onClick={async () => {
-                const teams = getFinalFourTeams(idx);
-                if (teams.length === 2) {
-                  const prediction = await predictMatchup(teams[0], teams[1]);
-                  if (prediction?.winner) {
-                    handleSelect(`finalfour-${idx}`, prediction.winner);
-                  } else {
-                    alert("Prediction failed.");
-                  }
-                } else {
-                  alert("Two teams must be selected to predict.");
-                }
-              }}
-              className="ml-2 px-2 py-1 text-sm bg-blue-200 rounded hover:bg-blue-300"
-            >
-              P
-            </button>
-          </div>
-        ))}
-      </div>
-
-      {/* Championship */}
-      
-      <div className="flex flex-col items-center "> 
-        <h2 className="text-2xl font-semibold mb-4 my-6">CHAMPIONSHIP GAME</h2>
-        <div className="w-72 h-20 border rounded shadow flex items-center justify-center">
+    {/* Final Four */}
+    <div className="flex justify-center items-center space-x-12 my-6">
+      {["South/East Winner", "West/Midwest Winner"].map((matchId, idx) => (
+        <div key={matchId} className="flex flex-col items-center">
+          <h2 className="font-semibold mb-2">FINAL FOUR</h2>
           <select
-            className="w-full h-full text-xl text-center"
-            value={selections["champion"] || ''}
-            onChange={(e) => handleSelect("champion", e.target.value)}
+            className="w-40 h-10 border rounded shadow"
+            value={selections[`finalfour-${idx}`] || ''}
+            onChange={(e) => handleSelect(`finalfour-${idx}`, e.target.value)}
           >
-            <option disabled value="">Select Winner</option>
-            {getChampionshipTeams().map(team => (
+            <option disabled value="">
+              Select Winner
+            </option>
+            {getFinalFourTeams(idx).map((team) => (
               <option key={team}>{team}</option>
             ))}
           </select>
           <button
             onClick={async () => {
-              const teams = getChampionshipTeams();
+              const teams = getFinalFourTeams(idx);
               if (teams.length === 2) {
                 const prediction = await predictMatchup(teams[0], teams[1]);
                 if (prediction?.winner) {
-                  handleSelect("champion", prediction.winner);
+                  handleSelect(`finalfour-${idx}`, prediction.winner);
                 } else {
                   alert("Prediction failed.");
                 }
@@ -180,31 +157,84 @@ const getFinalFourTeams = (idx) => {
                 alert("Two teams must be selected to predict.");
               }
             }}
-            className="ml-2 px-2 py-1 text-sm bg-blue-200 rounded hover:bg-blue-300"
+            className="mt-2 px-5 py-3 text-base bg-blue-200 rounded hover:bg-blue-300 whitespace-nowrap"
           >
             P
           </button>
-
         </div>
-        {/* Dynamically loaded Champion Logo */}
-        {selections["champion"] && (
-          <div className="mt-4 w-32 h-32 border rounded-full bg-gray-100 flex justify-center items-center">
+      ))}
+    </div>
+
+    {/* Championship */}
+    <div className="flex flex-col items-center my-6">
+      <h2 className="text-xl font-semibold mb-4">CHAMPIONSHIP GAME</h2>
+      <div className="flex flex-col items-center">
+        <select
+          className="w-48 h-12 border rounded shadow"
+          value={selections["champion"] || ''}
+          onChange={(e) => handleSelect("champion", e.target.value)}
+        >
+          <option disabled value="">
+            Select Winner
+          </option>
+          {getChampionshipTeams().map((team) => (
+            <option key={team}>{team}</option>
+          ))}
+        </select>
+        <button
+          onClick={async () => {
+            const teams = getChampionshipTeams();
+            if (teams.length === 2) {
+              const prediction = await predictMatchup(teams[0], teams[1]);
+              if (prediction?.winner) {
+                handleSelect("champion", prediction.winner);
+              } else {
+                alert("Prediction failed.");
+              }
+            } else {
+              alert("Two teams must be selected to predict.");
+            }
+          }}
+          className="mt-2 px-4 py-2 text-sm bg-blue-200 rounded hover:bg-blue-300 whitespace-nowrap"
+        >
+          P
+        </button>
+      </div>
+
+      {/* Dynamically loaded Champion Logo */}
+      {selections["champion"] && (
+        <div className="mt-4 w-32 h-32 border rounded-full bg-gray-100 flex justify-center items-center">
           <img
-            src={`/resources/logos/${selections["champion"].toLowerCase().replace(/[\s.&'-]/g, '')}.png`}
+            src={`/resources/logos/${selections["champion"]
+              .toLowerCase()
+              .replace(/[\s.&'-]/g, "")}.png`}
             alt={`${selections["champion"]} logo`}
             className="object-contain"
           />
         </div>
       )}
-      </div>
-
-      {/* Bottom Half */}
-      <div className="flex justify-center items-start space-x-32">
-        <RegionSection title="West" regionIdx={3} generateRounds={generateRounds} selections={selections} onSelect={handleSelect} />
-        <RegionSection title="Midwest" regionIdx={1} generateRounds={generateRounds} selections={selections} onSelect={handleSelect} flip />
-      </div>
     </div>
-  );
+
+    {/* Bottom Half */}
+    <div className="flex justify-center items-start space-x-16">
+      <RegionSection
+        title="West"
+        regionIdx={3}
+        generateRounds={generateRounds}
+        selections={selections}
+        onSelect={handleSelect}
+      />
+      <RegionSection
+        title="Midwest"
+        regionIdx={1}
+        generateRounds={generateRounds}
+        selections={selections}
+        onSelect={handleSelect}
+        flip
+      />
+    </div>
+  </div>
+);
 }
 
 function RegionSection({ title, regionIdx, generateRounds, selections, onSelect, flip }) {
@@ -218,8 +248,8 @@ function RegionSection({ title, regionIdx, generateRounds, selections, onSelect,
     const marginYClass = 'my-6'; 
     const marginRem = { 'my-1': 0.25, 'my-2': 0.5, 'my-3': 0.75, 'my-4': 1, 'my-5': 1.25, 'my-6': 1.5 }[marginYClass] || 0.5;
     const constantFactor = (boxHeightRem / 2) + marginRem;
-    const standardHorizontalMargin = '4rem';
-    const increasedHorizontalMargin = '4rem'; 
+    const standardHorizontalMargin = '3rem';
+    const increasedHorizontalMargin = '7rem'; 
     
 
 
@@ -237,7 +267,7 @@ function RegionSection({ title, regionIdx, generateRounds, selections, onSelect,
                         if (colIdx === 1) { // Margin before R2 column
                             marginLeftValue = standardHorizontalMargin;
                         } else if (colIdx === 2) { // Margin before R1 column
-                            marginLeftValue = increasedHorizontalMargin;
+                            marginLeftValue = standardHorizontalMargin;
                         } else if (colIdx === 3) { // Margin before R0 column
                             marginLeftValue = standardHorizontalMargin;
                         }
@@ -245,7 +275,11 @@ function RegionSection({ title, regionIdx, generateRounds, selections, onSelect,
                     } else {
                         // Not Flipped: Display order is R0, R1, R2, R3 (colIdx 0, 1, 2, 3)
                         // Apply standard margin to the left of columns R1, R2, R3
-                        if (colIdx > 0) {
+                        if (colIdx === 1) { 
+                            marginLeftValue = increasedHorizontalMargin;
+                        } else if (colIdx === 2) { 
+                            marginLeftValue = standardHorizontalMargin;
+                        } else if (colIdx === 3) {
                             marginLeftValue = standardHorizontalMargin;
                         }
                     }
@@ -289,7 +323,7 @@ function RegionSection({ title, regionIdx, generateRounds, selections, onSelect,
                                                   }
                                                 }
                                               }}
-                                              className="ml-2 px-2 py-0.5 text-xs bg-blue-200 rounded hover:bg-blue-300"
+                                              className="ml-2 px-3 py-2 text-xs bg-blue-200 rounded hover:bg-blue-300"
                                             >
                                               P
                                             </button>
