@@ -28,7 +28,7 @@ const regions = [
   { name: "West",   teams: [
       "Florida","Norfolk State","UConn","Oklahoma",
       "Memphis","Colorado St.","Maryland","Grand Canyon",
-      "Missouri","Drake","Texas Tech","UNC W",
+      "Missouri","Drake","Texas Tech","UNC Wilmington",
       "Kansas","Arkansas","St. John's","Omaha"
   ]}
 ];
