@@ -1,5 +1,5 @@
 # 🏀 March Madness Bracket Predictor
-# Access at: [https://march-madness-bracket.vercel.app/](url)
+# Access at: [https://march-madness-bracket.vercel.app/](https://march-madness-bracket.vercel.app/)
 
 A full-stack web app that lets users build out their own NCAA March Madness bracket — and use machine learning to **predict winners** of any matchup!
 
